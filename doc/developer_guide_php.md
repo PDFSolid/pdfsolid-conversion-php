@@ -1291,9 +1291,10 @@ Thanks for your interest in PDFSolid Conversion SDK, the easy-to-use and powerfu
 - Detailed descriptions of the problem.
 - Any other related information, such as an error screenshot.
 
-### **Contact Information**
+### Contact Information
 
-- Home link: [https://www.pdfsolid.com](https://www.pdfsolid.com/)
-- Email: [support@pdfsolid.com](mailto:support@pdfsolid.com)
+- Website: [https://www.pdfsolid.com](https://www.pdfsolid.com/)
+- Sales: [sales@pdfsolid.com](mailto:sales@pdfsolid.com)
+- Support: [support@pdfsolid.com](mailto:support@pdfsolid.com)
 
 Thanks,
