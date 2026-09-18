@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace PDFSolidKit\Conversion\Internal;
+namespace Conversion\Internal;
 
 use FFI;
 use FFI\CData;
-use PDFSolidKit\Conversion\Exception\PDFSolidException;
+use Conversion\Exception\ConversionException;
 
 /**
  * Resolves the platform-specific FFI handle and the native library directory.
@@ -13,7 +13,7 @@ use PDFSolidKit\Conversion\Exception\PDFSolidException;
  * The handle is loaded once per process and cached as a singleton. Native
  * libraries are looked up in this order:
  *
- *   1. The PDFSOLID_LIB_DIR environment variable (absolute path).
+ *   1. The CONVERSION_LIB_DIR environment variable (absolute path).
  *   2. <package-root>/lib/<linux|windows|mac/{arch}>.
  */
 final class FFIFactory
@@ -39,7 +39,7 @@ final class FFIFactory
 
         $cdef = file_get_contents($cdefFile);
         if ($cdef === false) {
-            throw new PDFSolidException("Failed to read FFI cdef: $cdefFile");
+            throw new ConversionException("Failed to read FFI cdef: $cdefFile");
         }
 
         // Strip the FFI_LIB directive so we can pass an absolute path instead
@@ -49,8 +49,8 @@ final class FFIFactory
         try {
             self::$ffi = FFI::cdef($cdef, $libFile);
         } catch (\Throwable $e) {
-            throw new PDFSolidException(
-                "Failed to load PDFSolid native library at $libFile: " . $e->getMessage(),
+            throw new ConversionException(
+                "Failed to load Conversion native library at $libFile: " . $e->getMessage(),
                 0,
                 $e
             );
@@ -65,10 +65,10 @@ final class FFIFactory
             return self::$libDir;
         }
 
-        $env = getenv('PDFSOLID_LIB_DIR');
+        $env = getenv('CONVERSION_LIB_DIR');
         if (is_string($env) && $env !== '') {
             if (!is_dir($env)) {
-                throw new PDFSolidException("PDFSOLID_LIB_DIR is set but not a directory: $env");
+                throw new ConversionException("CONVERSION_LIB_DIR is set but not a directory: $env");
             }
             return self::$libDir = $env;
         }
@@ -91,13 +91,13 @@ final class FFIFactory
                 $dir  = $root . '/lib/mac/' . $arch;
                 break;
             default:
-                throw new PDFSolidException("Unsupported OS: $os");
+                throw new ConversionException("Unsupported OS: $os");
         }
 
         if (!is_dir($dir)) {
-            throw new PDFSolidException(
+            throw new ConversionException(
                 "Native library directory not found: $dir\n" .
-                "Set PDFSOLID_LIB_DIR or make sure the package lib directory exists."
+                "Set CONVERSION_LIB_DIR or make sure the package lib directory exists."
             );
         }
 
@@ -112,13 +112,13 @@ final class FFIFactory
         $cdefDir = __DIR__ . '/cdef';
         switch (strtolower(PHP_OS_FAMILY)) {
             case 'linux':
-                return [$cdefDir . '/pdfsolid_linux.h',    $libDir . '/libpdfsolid_php_shim.so'];
+                return [$cdefDir . '/pdfsolid_linux.h',   $libDir . '/libcompdf_php_shim.so'];
             case 'windows':
-                return [$cdefDir . '/compdfkit_windows.h', $libDir . '/cpdfconversionsdk.dll'];
+                return [$cdefDir . '/pdfsolid_windows.h', $libDir . '/pdfsolidconversionsdk.dll'];
             case 'darwin':
-                return [$cdefDir . '/compdfkit_macos.h',   $libDir . '/libcpdfconversionsdk.dylib'];
+                return [$cdefDir . '/pdfsolid_macos.h',   $libDir . '/libpdfsolidconversionsdk.dylib'];
         }
-        throw new PDFSolidException('Unsupported OS family: ' . PHP_OS_FAMILY);
+        throw new ConversionException('Unsupported OS family: ' . PHP_OS_FAMILY);
     }
 
     private static function macArch(): string
@@ -130,7 +130,7 @@ final class FFIFactory
         if ($machine === 'x86_64' || $machine === 'amd64' || $machine === 'i386') {
             return 'x64';
         }
-        throw new PDFSolidException("Unsupported macOS architecture: $machine");
+        throw new ConversionException("Unsupported macOS architecture: $machine");
     }
 
     private static function windowsArch(): string

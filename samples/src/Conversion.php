@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace PDFSolidKit\Conversion;
+namespace Conversion;
 
 use FFI;
 use FFI\CData;
-use PDFSolidKit\Conversion\Internal\FFIFactory;
+use Conversion\Internal\FFIFactory;
 
 /**
  * High-level wrapper around the CPDF_StartPDFTo* functions. Each method
@@ -56,17 +56,17 @@ final class Conversion
     /**
      * Convenience wrapper: same as the specific method but throws on failure.
      *
-     * @throws Exception\PDFSolidException when the SDK returns a non-zero code.
+     * @throws Exception\ConversionException when the SDK returns a non-zero code.
      */
     public static function convert(string $format, string $in, string $password, string $out, ?ConvertOption $opt = null, ?ConvertCallback $cb = null): void
     {
         $method = 'pdfTo' . ucfirst(strtolower($format));
         if (!method_exists(self::class, $method)) {
-            throw new Exception\PDFSolidException("Unknown conversion target: $format");
+            throw new Exception\ConversionException("Unknown conversion target: $format");
         }
         $code = self::{$method}($in, $password, $out, $opt, $cb);
         if (!ErrorCode::isSuccess($code)) {
-            throw new Exception\PDFSolidException(
+            throw new Exception\ConversionException(
                 "$method failed: " . ErrorCode::describe($code),
                 $code
             );
@@ -105,6 +105,9 @@ final class Conversion
                 );
             } else {
                 $optionArg = PHP_OS_FAMILY === 'Linux' ? FFI::addr($cOpt) : $cOpt;
+                if (PHP_OS_FAMILY === 'Linux') {
+                    $sym = 'pdfsolid_php_convert_' . strtolower(substr($sym, strlen('CPDF_StartPDFTo')));
+                }
                 $rc = $ffi->{$sym}($in, $password, $out, $optionArg, $cbArg);
             }
             return (int) $rc;
@@ -134,6 +137,8 @@ final class Conversion
         $cOpt->excel_all_content             = $opt->excelAllContent;
         $cOpt->excel_csv_format              = $opt->excelCsvFormat;
         $cOpt->enable_ocr                    = $opt->enableOcr;
+        $cOpt->enable_document_orientation_classification = $opt->enableDocumentOrientationClassification;
+        $cOpt->enable_document_dewarp      = $opt->enableDocumentDewarp;
         $cOpt->transparent_text              = $opt->transparentText;
         $cOpt->txt_table_format              = $opt->txtTableFormat;
         $cOpt->image_path_enhance            = $opt->imagePathEnhance;

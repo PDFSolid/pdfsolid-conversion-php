@@ -1,11 +1,11 @@
-// PDFSolid Conversion SDK - FFI cdef (Linux)
+// Conversion SDK — FFI cdef (Linux / macOS)
 //
 // This file is consumed by PHP FFI::cdef(). It MUST NOT contain preprocessor
 // directives other than FFI_* ones, calling-convention macros, attributes,
-// or extern "C" blocks. Keep this file aligned with python/include/*_c.h.
+// or extern "C" blocks. Keep this file aligned with compdf_sdk/c/*_c.h.
 
 #define FFI_SCOPE "PDFSOLID_CONVERSION"
-#define FFI_LIB "libpdfsolid_php_shim.so"
+#define FFI_LIB "libcompdf_php_shim.so"
 
 typedef _Bool bool;
 
@@ -34,6 +34,9 @@ typedef enum {
     e_CErrLicenseIllegalAccess = 27,
     e_CErrLicenseFileReadFailed = 28,
     e_CErrLicenseOCRPermissionDeny = 29,
+    e_CErrLicenseConcurrencyExceeded = 30,
+    e_CErrLicensePageLimitExceeded = 31,
+    e_CErrLicenseQuotaCorrupted = 32,
     e_CErrNoTable = 40,
     e_CErrOCRFailure = 41,
     e_CErrConverting = 60,
@@ -52,6 +55,7 @@ typedef enum {
     e_CErrLicenseUnsupportedAPI = 92,
     e_CErrLicenseMismatch = 93,
     e_CErrInvalidTable = 94,
+    e_CErrUnsupportedFeature = 95,
     e_CErrUnknown = 100
 } CSDKErrorCode;
 
@@ -133,6 +137,8 @@ typedef struct CConvertOption {
     char font_name[256];
     char page_ranges[256];
     int* languages;                 // COCRLanguage*
+    bool enable_document_orientation_classification;
+    bool enable_document_dewarp;
 } CConvertOption;
 
 // ---------------------------------------------------------------------------
@@ -264,7 +270,7 @@ typedef struct {
 } da_dewarp_t;
 
 // ---------------------------------------------------------------------------
-// Common library (LibraryManager equivalents exported by the conversion SDK)
+// Common library (LibraryManager equivalents — exported in libpdfsolidconversionsdk)
 // ---------------------------------------------------------------------------
 
 CSDKErrorCode CPDF_LicenseVerify(const char* license, const char* device_id, const char* app_id);
@@ -280,23 +286,24 @@ void          CPDF_ReleaseDocumentAIModel(void);
 void          CPDF_SetDocumentAIModelCount(int layout_model_count, int table_model_count);
 
 // ---------------------------------------------------------------------------
-// Conversion API (pdfsolid_conversion_c.h)
+// PHP shim API. The SDK takes CConvertOption by value; these distinct shim
+// symbols accept a pointer and forward using the current SDK headers.
 // ---------------------------------------------------------------------------
 
-CSDKErrorCode CPDF_StartPDFToWord(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
-CSDKErrorCode CPDF_StartPDFToRtf(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
-CSDKErrorCode CPDF_StartPDFToExcel(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
-CSDKErrorCode CPDF_StartPDFToPpt(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
-CSDKErrorCode CPDF_StartPDFToHtml(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
-CSDKErrorCode CPDF_StartPDFToImage(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
-CSDKErrorCode CPDF_StartPDFToSearchablePDF(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
-CSDKErrorCode CPDF_StartPDFToTxt(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
-CSDKErrorCode CPDF_StartPDFToJson(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
-CSDKErrorCode CPDF_StartPDFToMarkdown(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
-CSDKErrorCode CPDF_StartPDFToOfd(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_convert_word(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_convert_rtf(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_convert_excel(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_convert_ppt(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_convert_html(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_convert_image(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_convert_searchablepdf(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_convert_txt(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_convert_json(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_convert_markdown(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_convert_ofd(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
 
 // ---------------------------------------------------------------------------
-// Document AI API (pdfsolid_document_ai_c.h)
+// Document AI API (conversion_document_ai_c.h)
 // ---------------------------------------------------------------------------
 
 CSDKErrorCode CPDF_Ocr(const char* file_path, int* languages, int language_count,

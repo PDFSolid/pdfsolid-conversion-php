@@ -1,19 +1,18 @@
 <?php
 declare(strict_types=1);
 
-namespace PDFSolidKit\Conversion;
+namespace Conversion;
 
 use FFI;
 use FFI\CData;
-use PDFSolidKit\Conversion\Exception\PDFSolidException;
-use PDFSolidKit\Conversion\Internal\FFIFactory;
+use Conversion\Exception\ConversionException;
+use Conversion\Internal\FFIFactory;
 
 /**
  * Common SDK lifecycle: license verification, initialization, logging,
  * version info, page-count queries, and shutdown.
  *
- * Equivalent to PDFSolid::common::LibraryManager in C++ and the
- * `pdfsolid_go_*` helpers in the Go binding.
+ * Equivalent to the common LibraryManager in C++ and the Go binding helpers.
  */
 final class LibraryManager
 {
@@ -126,7 +125,7 @@ final class LibraryManager
     {
         $utf16 = mb_convert_encoding($utf8, 'UTF-16LE', 'UTF-8');
         if ($utf16 === false) {
-            throw new PDFSolidException('Failed to convert string to UTF-16LE');
+            throw new ConversionException('Failed to convert string to UTF-16LE');
         }
         $bytes   = strlen($utf16);
         $count   = ($bytes / 2) + 1; // +1 for NUL terminator

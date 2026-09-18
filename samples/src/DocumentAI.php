@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace PDFSolidKit\Conversion;
+namespace Conversion;
 
 use FFI;
 use FFI\CData;
-use PDFSolidKit\Conversion\Exception\PDFSolidException;
-use PDFSolidKit\Conversion\Internal\FFIFactory;
+use Conversion\Exception\ConversionException;
+use Conversion\Internal\FFIFactory;
 
 /**
  * Thin wrapper over the document-AI C entrypoints. Each method returns plain
@@ -148,7 +148,7 @@ final class DocumentAI
     private static function check(int $rc, string $where): void
     {
         if (!ErrorCode::isSuccess($rc)) {
-            throw new PDFSolidException("$where failed: " . ErrorCode::describe($rc), $rc);
+            throw new ConversionException("$where failed: " . ErrorCode::describe($rc), $rc);
         }
     }
 }

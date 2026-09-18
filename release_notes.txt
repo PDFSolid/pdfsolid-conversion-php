@@ -1,44 +1,23 @@
-PDFSolid Conversion SDK v1.1.0 Release Date: 28 May 2026
-=====================================================
+PDFSolid Conversion SDK for PHP 1.2.0 - Linux x86_64
+Packaged: 2026-09-17
 
-Enhanced Features
+Native SDK, DocumentAI, ONNX Runtime and OpenCV come from out/release.
+The model comes from PDFSolid_Conversion_linux_c_1_2_0/resource/models/documentai.model.
 
-Core:
-- Added support for online license validation using XML license configuration files.
-- Added external AI callback interfaces for OCR, layout analysis, and table recognition, enabling integration with custom AI models.
-- Added support for scanning system fonts and improved font style matching.
+Updated PHP FFI declarations and rebuilt the C bridge against the current C API.
+CConvertOption grew from 568 to 576 bytes on Linux x86_64:
+  enable_document_orientation_classification (offset 568)
+  enable_document_dewarp (offset 569)
+The current PHP API also exposes the corresponding option properties and
+license concurrency/page-limit/quota and unsupported-feature error codes.
 
-PDF to Word:
-- Added support for vertical text layout in Word output.
-- Added support for merging repeated headers and footers, with improved dynamic footer page number handling.
-- Added support for improved export of short hanging-indent paragraphs.
-- Improved header/footer, paragraph, table, text box, image, and multi-column layout restoration.
+The bridge uses distinct pdfsolid_php_convert_* entry points for the PHP
+pointer-to-structure interface, preserving the SDK's by-value C ABI.
+The normal PHP conversion methods retain their names and callback arguments.
 
-PDF to Image:
-- Added support for rendering form fields during image conversion.
+The direct conversion demo now explicitly loads and releases the packaged AI
+model.
 
-OCR and AI:
-- Added an independent configuration option for AI-based table recognition.
-- Improved OCR paragraph font sizing and character width estimation.
-
-Issues Addressed
-
-Core:
-- Improved conversion stability, memory usage, and multi-threaded resource handling.
-- Improved handling of generated spaces, CJK text spacing, document transformations, links, SVG resources, path merging, and large image processing.
-
-PDF to Word:
-- Improved list recognition accuracy and reduced false positives for ambiguous ordered and unordered list markers.
-- Fixed issues where regular text, paragraphs, or special reference markers could be incorrectly recognized as list items.
-- Improved DOCX layout fidelity for list numbering, line-number paragraphs, CJK fonts, paragraph spacing, line height, indentation, compact tables, and table cell padding.
-- Fixed layout issues involving floating images, inline images, rotated images, special page numbers, text boxes, constrained containers, and multi-line headings.
-- Improved visual line grouping, paragraph splitting, text scaling, and layout measurement accuracy.
-
-Fonts:
-- Improved font substitution accuracy for missing glyphs, weight and style matching, width variants, CJK language matching, Japanese font preference, and symbol font normalization.
-
-PDF to Searchable PDF:
-- Fixed font selection issues in searchable PDF output and improved text layer font consistency.
-
-Table Recognition:
-- Improved table background extraction and table content alignment accuracy.
+Use the Conversion\ PHP namespace and samples/pdfsolidphp launcher.
+samples/compdfphp remains available as an alias.
+Native bridge source and matching C headers are included in native/.

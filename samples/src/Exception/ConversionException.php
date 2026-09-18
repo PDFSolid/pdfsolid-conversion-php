@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace PDFSolidKit\Conversion\Exception;
+namespace Conversion\Exception;
 
-class PDFSolidException extends \RuntimeException
+class ConversionException extends \RuntimeException
 {
     /** @var int CSDKErrorCode value returned by the native SDK. */
     private int $sdkCode;

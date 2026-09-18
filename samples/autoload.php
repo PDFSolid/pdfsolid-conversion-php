@@ -2,15 +2,15 @@
 declare(strict_types=1);
 
 if (PHP_VERSION_ID < 70400) {
-    throw new RuntimeException('PDFSolid Conversion PHP SDK requires PHP 7.4 or later.');
+    throw new RuntimeException('Conversion PHP SDK requires PHP 7.4 or later.');
 }
 
 if (!extension_loaded('ffi')) {
-    throw new RuntimeException('PDFSolid Conversion PHP SDK requires the PHP FFI extension.');
+    throw new RuntimeException('Conversion PHP SDK requires the PHP FFI extension.');
 }
 
 spl_autoload_register(static function (string $class): void {
-    $prefix = 'PDFSolidKit\\Conversion\\';
+    $prefix = 'Conversion\\';
     $prefixLength = strlen($prefix);
 
     if (strncmp($class, $prefix, $prefixLength) !== 0) {

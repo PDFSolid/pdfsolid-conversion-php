@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace PDFSolidKit\Conversion;
+namespace Conversion;
 
 final class ExcelWorksheetOption
 {

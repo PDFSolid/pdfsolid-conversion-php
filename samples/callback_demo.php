@@ -5,15 +5,15 @@ declare(strict_types=1);
 // DocumentAI model lifecycle helpers exposed in PHP SDK v4.1.0+.
 //
 // Usage:
-//   samples/pdfsolidphp samples/callback_demo.php
+//   samples/compdfphp samples/callback_demo.php
 
 require __DIR__ . '/autoload.php';
 
-use PDFSolidKit\Conversion\Conversion;
-use PDFSolidKit\Conversion\ConvertCallback;
-use PDFSolidKit\Conversion\ConvertOption;
-use PDFSolidKit\Conversion\ErrorCode;
-use PDFSolidKit\Conversion\LibraryManager;
+use Conversion\Conversion;
+use Conversion\ConvertCallback;
+use Conversion\ConvertOption;
+use Conversion\ErrorCode;
+use Conversion\LibraryManager;
 
 $resource = dirname(__DIR__);
 $input    = __DIR__ . '/input_files/word.pdf';

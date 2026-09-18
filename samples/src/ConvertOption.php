@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace PDFSolidKit\Conversion;
+namespace Conversion;
 
 /**
  * High-level mirror of CConvertOption. Use the public properties to configure
@@ -18,6 +18,8 @@ class ConvertOption
     public bool $excelAllContent = false;
     public bool $excelCsvFormat = false;
     public bool $enableOcr = false;
+    public bool $enableDocumentOrientationClassification = false;
+    public bool $enableDocumentDewarp = false;
     public bool $transparentText = false;
     public bool $txtTableFormat = false;
     public bool $imagePathEnhance = false;

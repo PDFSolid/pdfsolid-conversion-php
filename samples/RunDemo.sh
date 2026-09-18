@@ -20,7 +20,7 @@ require_command() {
 }
 
 require_command php
-require_file "$SCRIPT_DIR/pdfsolidphp"
+require_file "$SCRIPT_DIR/compdfphp"
 require_file "$SCRIPT_DIR/license.xml"
 require_file "$PKG_ROOT/resource/models/documentai.model"
 require_file "$SCRIPT_DIR/input_files/word.pdf"
@@ -31,7 +31,7 @@ rm -rf "$OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
 
 cd "$PKG_ROOT"
-"$SCRIPT_DIR/pdfsolidphp" "$SCRIPT_DIR/direct_convert_demo.php"
+"$SCRIPT_DIR/compdfphp" "$SCRIPT_DIR/direct_convert_demo.php"
 
 printf '\nOutput file count: '
 find "$OUTPUT_DIR" -type f | wc -l

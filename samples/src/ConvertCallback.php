@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace PDFSolidKit\Conversion;
+namespace Conversion;
 
 use FFI;
 use FFI\CData;
@@ -9,7 +9,7 @@ use FFI\CData;
 /**
  * High-level holder for the optional native callbacks accepted by every
  * `CPDF_StartPDFTo*` function. Equivalent to the C `CConvertCallback` struct
- * (see `common/com_config_macros.h` in the SDK source tree).
+ * (see `pdfsolid_config_macros.h` in the SDK release headers).
  *
  * Assign any subset of callables; unset slots are reported to the SDK as
  * `NULL`, restoring the built-in behaviour for that hook.

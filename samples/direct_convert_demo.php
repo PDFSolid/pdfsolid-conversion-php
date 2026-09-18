@@ -4,33 +4,33 @@ declare(strict_types=1);
 // One-command conversion smoke demo for package verification.
 //
 // Usage:
-//   samples/pdfsolidphp samples/direct_convert_demo.php
+//   samples/compdfphp samples/direct_convert_demo.php
 //
 // Environment overrides:
-//   PDFSOLID_DEMO_LICENSE   override the packaged license XML path.
-//   PDFSOLID_DEMO_DEVICE_ID optional device ID.
-//   PDFSOLID_DEMO_APP_ID    optional app ID.
-//   PDFSOLID_RESOURCE       path passed to LibraryManager::initialize().
+//   CONVERSION_DEMO_LICENSE   override the packaged license XML path.
+//   CONVERSION_DEMO_DEVICE_ID optional device ID.
+//   CONVERSION_DEMO_APP_ID    optional app ID.
+//   CONVERSION_RESOURCE       path passed to LibraryManager::initialize().
 
 require __DIR__ . '/autoload.php';
 
-use PDFSolidKit\Conversion\Conversion;
-use PDFSolidKit\Conversion\ConvertOption;
-use PDFSolidKit\Conversion\ErrorCode;
-use PDFSolidKit\Conversion\LibraryManager;
-use PDFSolidKit\Conversion\OcrLanguage;
-use PDFSolidKit\Conversion\PageLayoutMode;
+use Conversion\Conversion;
+use Conversion\ConvertOption;
+use Conversion\ErrorCode;
+use Conversion\LibraryManager;
+use Conversion\OcrLanguage;
+use Conversion\PageLayoutMode;
 
 const LICENSE_FILE_NAME = 'license.xml';
 
 $inputDir = __DIR__ . '/input_files';
 $outputDir = __DIR__ . '/output_files';
-$resourcePath = getenv('PDFSOLID_RESOURCE') ?: dirname(__DIR__);
+$resourcePath = getenv('CONVERSION_RESOURCE') ?: dirname(__DIR__);
 $modelPath = $resourcePath . '/resource/models/documentai.model';
 
-$license = getenv('PDFSOLID_DEMO_LICENSE') ?: __DIR__ . '/' . LICENSE_FILE_NAME;
-$deviceId = getenv('PDFSOLID_DEMO_DEVICE_ID') ?: '';
-$appId = getenv('PDFSOLID_DEMO_APP_ID') ?: '';
+$license = getenv('CONVERSION_DEMO_LICENSE') ?: __DIR__ . '/' . LICENSE_FILE_NAME;
+$deviceId = getenv('CONVERSION_DEMO_DEVICE_ID') ?: '';
+$appId = getenv('CONVERSION_DEMO_APP_ID') ?: '';
 
 foreach (['word.pdf', 'excel.pdf', 'powerpoint.pdf'] as $inputName) {
     $inputPath = $inputDir . '/' . $inputName;
@@ -62,6 +62,10 @@ LibraryManager::initialize($resourcePath);
 LibraryManager::setLogger(false, true);
 
 try {
+    $modelCode = LibraryManager::setDocumentAIModel($modelPath, -1);
+    if (!ErrorCode::isSuccess($modelCode)) {
+        throw new RuntimeException('Model load failed: ' . ErrorCode::describe($modelCode));
+    }
     $option = new ConvertOption();
     $option->containImage = true;
     $option->containAnnotation = true;
@@ -130,6 +134,7 @@ try {
     fwrite(STDERR, 'Conversion failed: ' . $e->getMessage() . PHP_EOL);
     exit(3);
 } finally {
+    LibraryManager::releaseDocumentAIModel();
     LibraryManager::release();
 }
 

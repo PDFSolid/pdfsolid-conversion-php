@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace PDFSolidKit\Conversion;
+namespace Conversion;
 
 /**
  * CSDKErrorCode mirror. Keep in sync with samples/src/Internal/cdef/*.h.
@@ -28,6 +28,9 @@ final class ErrorCode
     public const LICENSE_ILLEGAL_ACCESS = 27;
     public const LICENSE_FILE_READ_FAILED = 28;
     public const LICENSE_OCR_PERMISSION_DENY = 29;
+    public const LICENSE_CONCURRENCY_EXCEEDED = 30;
+    public const LICENSE_PAGE_LIMIT_EXCEEDED = 31;
+    public const LICENSE_QUOTA_CORRUPTED = 32;
     public const NO_TABLE = 40;
     public const OCR_FAILURE = 41;
     public const CONVERTING = 60;
@@ -46,6 +49,7 @@ final class ErrorCode
     public const LICENSE_UNSUPPORTED_API = 92;
     public const LICENSE_MISMATCH = 93;
     public const INVALID_TABLE = 94;
+    public const UNSUPPORTED_FEATURE = 95;
     public const UNKNOWN = 100;
 
     private const NAMES = [
@@ -69,6 +73,9 @@ final class ErrorCode
         27 => 'License illegal access',
         28 => 'License file read failed',
         29 => 'License OCR permission denied',
+        30 => 'License concurrency exceeded',
+        31 => 'License page limit exceeded',
+        32 => 'License quota corrupted',
         40 => 'No table',
         41 => 'OCR failure',
         60 => 'Converting error',
@@ -87,6 +94,7 @@ final class ErrorCode
         92 => 'License unsupported API',
         93 => 'License mismatch',
         94 => 'Invalid table',
+        95 => 'Unsupported document feature',
         100 => 'Unknown error',
     ];
 
