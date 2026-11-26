@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Conversion\Internal;
+namespace PdfSolidConversion\Internal;
 
 use FFI;
 use FFI\CData;
-use Conversion\Exception\ConversionException;
+use PdfSolidConversion\Exception\ConversionException;
 
 /**
  * Resolves the platform-specific FFI handle and the native library directory.
@@ -112,7 +112,7 @@ final class FFIFactory
         $cdefDir = __DIR__ . '/cdef';
         switch (strtolower(PHP_OS_FAMILY)) {
             case 'linux':
-                return [$cdefDir . '/pdfsolid_linux.h',   $libDir . '/libcompdf_php_shim.so'];
+                return [$cdefDir . '/pdfsolid_linux.h',   $libDir . '/libpdfsolid_php_shim.so'];
             case 'windows':
                 return [$cdefDir . '/pdfsolid_windows.h', $libDir . '/pdfsolidconversionsdk.dll'];
             case 'darwin':

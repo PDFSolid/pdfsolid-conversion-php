@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Conversion;
+namespace PdfSolidConversion;
 
 use FFI;
 use FFI\CData;
-use Conversion\Internal\FFIFactory;
+use PdfSolidConversion\Internal\FFIFactory;
 
 /**
- * High-level wrapper around the CPDF_StartPDFTo* functions. Each method
+ * High-level wrapper around the native PDF and Word conversion functions. Each method
  * returns the raw CSDKErrorCode integer. Use {@see ErrorCode} to interpret
  * the value, or call {@see Conversion::convert()} which throws on error.
  *
@@ -19,6 +19,10 @@ use Conversion\Internal\FFIFactory;
 final class Conversion
 {
     private function __construct() {}
+
+    /** Converts Word to PDF. Only pageRanges and wordPdfBookmarkMode apply. */
+    public static function wordToPdf(string $in, string $out, ?ConvertOption $opt = null, ?ConvertCallback $cb = null): int
+    { return self::dispatch('CPDF_StartWordToPDF', $in, '', $out, $opt, $cb); }
 
     public static function pdfToWord(string $in, string $password, string $out, ?ConvertOption $opt = null, ?ConvertCallback $cb = null): int
     { return self::dispatch('CPDF_StartPDFToWord', $in, $password, $out, $opt, $cb); }
@@ -89,34 +93,40 @@ final class Conversion
         // PHP trampolines are not garbage-collected mid-conversion.
         $cbCData = null;
         $cbArg = null;
-        if ($cb !== null) {
-            $cbCData = $cb->buildCData($ffi);
-            $cbArg = FFI::addr($cbCData);
-        }
-
         try {
-            if (LibraryManager::isWindows()) {
-                $rc = $ffi->{$sym}(
-                    LibraryManager::toWString($in),
-                    LibraryManager::toWString($password),
-                    LibraryManager::toWString($out),
-                    $cOpt,
-                    $cbArg
-                );
+            if ($cb !== null) {
+                // Isolate closures and buffers when the same callback is used recursively.
+                $cb = clone $cb;
+                $cbCData = $cb->buildCData($ffi);
+                $cbArg = FFI::addr($cbCData);
+            }
+
+            $wordToPdf = $sym === 'CPDF_StartWordToPDF';
+            $input = LibraryManager::isWindows() ? LibraryManager::toWString($in) : $in;
+            $output = LibraryManager::isWindows() ? LibraryManager::toWString($out) : $out;
+            if (PHP_OS_FAMILY === 'Linux') {
+                $sym = $wordToPdf ? 'pdfsolid_php_start_word_to_pdf'
+                    : 'pdfsolid_php_start_pdf_to_' . strtolower(substr($sym, strlen('CPDF_StartPDFTo')));
+            }
+            $optionArg = PHP_OS_FAMILY === 'Linux' ? FFI::addr($cOpt) : $cOpt;
+            if ($wordToPdf) {
+                $rc = $ffi->{$sym}($input, $output, $optionArg, $cbArg, null);
             } else {
-                $optionArg = PHP_OS_FAMILY === 'Linux' ? FFI::addr($cOpt) : $cOpt;
-                if (PHP_OS_FAMILY === 'Linux') {
-                    $sym = 'pdfsolid_php_convert_' . strtolower(substr($sym, strlen('CPDF_StartPDFTo')));
-                }
-                $rc = $ffi->{$sym}($in, $password, $out, $optionArg, $cbArg);
+                $nativePassword = LibraryManager::isWindows() ? LibraryManager::toWString($password) : $password;
+                $rc = $ffi->{$sym}($input, $nativePassword, $output, $optionArg, $cbArg);
+            }
+            if ($cb !== null) {
+                $cb->throwPendingException();
             }
             return (int) $rc;
         } finally {
             if ($languagesHolder !== null) {
                 FFI::free($languagesHolder);
             }
-            // $cbCData / $cb fall out of scope here after the SDK call.
-            unset($cbCData, $cb);
+            unset($cbCData, $cbArg);
+            if ($cb !== null) {
+                $cb->releaseNativeResources();
+            }
         }
     }
 
@@ -130,6 +140,7 @@ final class Conversion
     {
         $cOpt->enable_ai_layout              = $opt->enableAiLayout;
         $cOpt->enable_ai_table_recognition   = $opt->enableAiTableRecognition;
+        $cOpt->table_recognition_accuracy    = $opt->tableRecognitionAccuracy;
         $cOpt->contain_image                 = $opt->containImage;
         $cOpt->contain_page_background_image = $opt->containPageBackgroundImage;
         $cOpt->json_contain_table            = $opt->jsonContainTable;
@@ -138,6 +149,9 @@ final class Conversion
         $cOpt->excel_csv_format              = $opt->excelCsvFormat;
         $cOpt->enable_ocr                    = $opt->enableOcr;
         $cOpt->enable_document_orientation_classification = $opt->enableDocumentOrientationClassification;
+        $cOpt->enable_auto_page_size         = $opt->enableAutoPageSize;
+        $cOpt->custom_page_width             = $opt->customPageWidth;
+        $cOpt->custom_page_height            = $opt->customPageHeight;
         $cOpt->enable_document_dewarp      = $opt->enableDocumentDewarp;
         $cOpt->transparent_text              = $opt->transparentText;
         $cOpt->txt_table_format              = $opt->txtTableFormat;
@@ -153,6 +167,7 @@ final class Conversion
         $cOpt->ocr_option                    = $opt->ocrOption;
         $cOpt->image_color_mode              = $opt->imageColorMode;
         $cOpt->image_type                    = $opt->imageType;
+        $cOpt->word_pdf_bookmark_mode         = $opt->wordPdfBookmarkMode;
 
         self::writeFixedString($cOpt->font_name,   256, $opt->fontName);
         self::writeFixedString($cOpt->page_ranges, 256, $opt->pageRanges);

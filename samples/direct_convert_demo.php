@@ -4,31 +4,38 @@ declare(strict_types=1);
 // One-command conversion smoke demo for package verification.
 //
 // Usage:
-//   samples/compdfphp samples/direct_convert_demo.php
+//   samples/pdfsolidphp samples/direct_convert_demo.php
 //
 // Environment overrides:
 //   CONVERSION_DEMO_LICENSE   override the packaged license XML path.
 //   CONVERSION_DEMO_DEVICE_ID optional device ID.
 //   CONVERSION_DEMO_APP_ID    optional app ID.
-//   CONVERSION_RESOURCE       path passed to LibraryManager::initialize().
+//   CONVERSION_RESOURCE       compatibility resource path passed to initialize(); models load separately.
 
 require __DIR__ . '/autoload.php';
 
-use Conversion\Conversion;
-use Conversion\ConvertOption;
-use Conversion\ErrorCode;
-use Conversion\LibraryManager;
-use Conversion\OcrLanguage;
-use Conversion\PageLayoutMode;
+use PdfSolidConversion\Conversion;
+use PdfSolidConversion\ConvertOption;
+use PdfSolidConversion\ErrorCode;
+use PdfSolidConversion\LibraryManager;
+use PdfSolidConversion\OcrLanguage;
+use PdfSolidConversion\PageLayoutMode;
 
 const LICENSE_FILE_NAME = 'license.xml';
 
+$arguments = getopt('', ['suite:']);
+$suite = $arguments['suite'] ?? 'all';
+if (!in_array($suite, ['all', 'office'], true)) {
+    fwrite(STDERR, "--suite must be all or office (Word, Excel, PPT)" . PHP_EOL);
+    exit(1);
+}
+
 $inputDir = __DIR__ . '/input_files';
 $outputDir = __DIR__ . '/output_files';
-$resourcePath = getenv('CONVERSION_RESOURCE') ?: dirname(__DIR__);
-$modelPath = $resourcePath . '/resource/models/documentai.model';
+$resourcePath = getenv('CONVERSION_RESOURCE') ?: '';
+$modelPath = dirname(__DIR__) . '/resource/models/documentai.model';
 
-$license = getenv('CONVERSION_DEMO_LICENSE') ?: __DIR__ . '/' . LICENSE_FILE_NAME;
+$license = getenv('CONVERSION_DEMO_LICENSE') ?: dirname(__DIR__) . '/resource/license/' . LICENSE_FILE_NAME;
 $deviceId = getenv('CONVERSION_DEMO_DEVICE_ID') ?: '';
 $appId = getenv('CONVERSION_DEMO_APP_ID') ?: '';
 
@@ -53,6 +60,8 @@ foreach (glob($outputDir . '/*') ?: [] as $oldPath) {
 }
 
 $licenseCode = LibraryManager::licenseVerify($license, $deviceId, $appId);
+reportResult('license', $licenseCode);
+echo 'licenseVerify => ' . $licenseCode . PHP_EOL;
 if (!ErrorCode::isSuccess($licenseCode)) {
     fwrite(STDERR, 'License verify failed: ' . ErrorCode::describe($licenseCode) . " ({$licenseCode})" . PHP_EOL);
     exit(2);
@@ -63,10 +72,14 @@ LibraryManager::setLogger(false, true);
 
 try {
     $modelCode = LibraryManager::setDocumentAIModel($modelPath, -1);
+    reportResult('model', $modelCode);
+    echo 'setDocumentAIModel => ' . $modelCode . PHP_EOL;
     if (!ErrorCode::isSuccess($modelCode)) {
-        throw new RuntimeException('Model load failed: ' . ErrorCode::describe($modelCode));
+        throw new RuntimeException('DocumentAI model failed: ' . $modelCode);
     }
     $option = new ConvertOption();
+    $option->enableAiLayout = true;
+    $option->enableAiTableRecognition = true;
     $option->containImage = true;
     $option->containAnnotation = true;
     $option->autoCreateFolder = true;
@@ -86,6 +99,29 @@ try {
     runConversion('pdf to ppt', function () use ($inputDir, $outputDir, $option): int {
         return Conversion::pdfToPpt($inputDir . '/powerpoint.pdf', '', $outputDir . '/powerpoint.pptx', $option);
     }, $outputDir . '/powerpoint.pptx');
+
+    $docx = $inputDir . '/word.docx';
+    $ranged = new ConvertOption();
+    $ranged->pageRanges = '1-2';
+    $ranged->wordPdfBookmarkMode = \Conversion\WordPdfBookmarkMode::HEADINGS;
+    foreach ([
+        ['word to pdf', 'word_to_pdf.pdf', null],
+        ['word to pdf with options', 'word_to_pdf_bookmarks.pdf', $ranged],
+    ] as [$label, $filename, $wordOptions]) {
+        $pdf = $outputDir . '/' . $filename;
+        $code = Conversion::wordToPdf($docx, $pdf, $wordOptions);
+        reportResult($label, $code);
+        echo $label . ': ' . $code . PHP_EOL;
+        if (!in_array($code, [0, 95], true) || !is_file($pdf) || filesize($pdf) === 0) {
+            throw new RuntimeException($label . ' did not produce a PDF; SDK code ' . $code);
+        }
+        if ($code === 95) fwrite(STDERR, "PDF produced with unsupported Word features.\n");
+    }
+
+    if ($suite === 'office') {
+        echo 'OK: all office conversion tests succeeded' . PHP_EOL;
+        return;
+    }
 
     $option->excelCsvFormat = true;
     runConversion('pdf to csv', function () use ($inputDir, $outputDir, $option): int {
@@ -138,6 +174,16 @@ try {
     LibraryManager::release();
 }
 
+function reportResult(string $step, int $code): void
+{
+    $path = getenv('CONVERSION_DEMO_REPORT');
+    if ($path !== false && $path !== '') {
+        if (file_put_contents($path, json_encode(['step' => $step, 'code' => $code], JSON_THROW_ON_ERROR) . PHP_EOL, FILE_APPEND) === false) {
+            throw new RuntimeException('Cannot write demo result report');
+        }
+    }
+}
+
 /**
  * @param callable():int $convert
  */
@@ -145,6 +191,7 @@ function runConversion(string $name, callable $convert, string $expectedPath, bo
 {
     $before = snapshot($expectedPath);
     $code = $convert();
+    reportResult($name, $code);
     echo $name . ': ' . $code . PHP_EOL;
     if (!ErrorCode::isSuccess($code)) {
         throw new RuntimeException($name . ' failed: ' . ErrorCode::describe($code) . " ({$code})");

@@ -1,10 +1,11 @@
 # PDFSolid Conversion SDK for PHP
 
-High-performance PHP SDK for converting PDF to Word, Excel, PowerPoint, HTML, Image, TXT, RTF, CSV, JSON, Markdown, Searchable PDF, and OFD with AI-powered OCR, layout analysis, and table recognition.
+High-performance PHP SDK for converting PDF to Word, Excel, PowerPoint, HTML, Image, TXT, RTF, CSV, JSON, Markdown, Searchable PDF, and OFD with AI-powered OCR, layout analysis, and table recognition. SDK v1.3.0 also converts Word documents (`.docx`) to PDF.
 
 ## Features
 
 - **PDF to Word** (.docx) — Flow and Box layout modes
+- **Word to PDF** (.docx → .pdf) — optional page ranges and PDF bookmarks
 - **PDF to Excel** (.xlsx) — per-table, per-page, or per-document worksheet options
 - **PDF to PowerPoint** (.pptx)
 - **PDF to HTML** (.html) — single/multi-page with optional bookmark navigation
@@ -40,26 +41,31 @@ Contact [sales@pdfsolid.com](mailto:sales@pdfsolid.com) for a 30-day free trial 
 
 ```php
 <?php
-require __DIR__ . '/autoload.php';
+// For a script placed in the package root.
+require __DIR__ . '/samples/autoload.php';
 
-use PDFSolidKit\Conversion\LibraryManager;
-use PDFSolidKit\Conversion\ErrorCode;
+use PdfSolidConversion\LibraryManager;
+use PdfSolidConversion\ErrorCode;
 
-$resourcePath = dirname(__DIR__);
-
-$code = LibraryManager::licenseVerify($resourcePath . '/license.xml', '', '');
+$code = LibraryManager::licenseVerify('/path/to/license.xml');
 if (!ErrorCode::isSuccess($code)) {
     throw new RuntimeException('License verify failed: ' . ErrorCode::describe($code));
 }
 
-LibraryManager::initialize($resourcePath);
+LibraryManager::initialize('');
+```
+
+Run the script from the package root through the SDK launcher, which preloads native libraries before PHP starts:
+
+```sh
+bash samples/pdfsolidphp -d ffi.enable=true your_script.php
 ```
 
 ### 3. Convert
 
 ```php
-use PDFSolidKit\Conversion\Conversion;
-use PDFSolidKit\Conversion\ConvertOption;
+use PdfSolidConversion\Conversion;
+use PdfSolidConversion\ConvertOption;
 
 $option = new ConvertOption();
 Conversion::convert('Word', 'input.pdf', '', 'output.docx', $option);
@@ -74,10 +80,22 @@ LibraryManager::release();
 
 ## Conversion Examples
 
+### Word (DOCX) to PDF
+
+Use the bundled Linux x86_64 PHP FFI binding, with `samples/autoload.php` loaded. After applying the license and initializing the SDK, pass a `.docx` input and a writable `.pdf` output.
+
+```php
+$status = \PdfSolidConversion\Conversion::wordToPdf('input.docx', 'output.pdf');
+```
+
+The default converts all pages without PDF bookmarks. On an optional `PdfSolidConversion\ConvertOption` passed as the third argument, set `pageRanges` to select pages (for example, `1-2`) and `wordPdfBookmarkMode` to generate bookmarks from headings or Word bookmarks. Check the returned status before using the PDF. `PdfSolidConversion\ErrorCode::UNSUPPORTED_FEATURE` means the input contains features that may affect fidelity; a PDF may still have been written.
+
+See the [Word to PDF API reference](doc/html/word_to_pdf.html) and [PHP sample](samples/direct_convert_demo.php).
+
 ### PDF to Excel
 
 ```php
-use PDFSolidKit\Conversion\ExcelWorksheetOption;
+use PdfSolidConversion\ExcelWorksheetOption;
 
 $option = new ConvertOption();
 $option->excelWorksheetOption = ExcelWorksheetOption::FOR_TABLE;
@@ -87,7 +105,7 @@ Conversion::convert('Excel', 'input.pdf', '', 'output.xlsx', $option);
 ### PDF to Image
 
 ```php
-use PDFSolidKit\Conversion\ImageType;
+use PdfSolidConversion\ImageType;
 
 $option = new ConvertOption();
 $option->imageType = ImageType::PNG;
@@ -98,7 +116,7 @@ Conversion::convert('Image', 'input.pdf', '', 'output', $option);
 ### PDF to Searchable PDF (OCR)
 
 ```php
-use PDFSolidKit\Conversion\OcrLanguage;
+use PdfSolidConversion\OcrLanguage;
 
 $option = new ConvertOption();
 $option->enableOcr = true;
@@ -119,7 +137,7 @@ Conversion::convert('Json', 'input.pdf', '', 'output.json', $option);
 ### Custom AI Engine (SDK v1.1.0+)
 
 ```php
-use PDFSolidKit\Conversion\ConvertCallback;
+use PdfSolidConversion\ConvertCallback;
 
 $cb = new ConvertCallback();
 $cb->onOcr = static function (string $imagePath) use (&$ocrJson): bool {

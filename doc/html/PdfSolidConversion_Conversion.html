@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conversion</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav aria-label="Conversion API" style="padding:.5rem 1rem"><a href="word_to_pdf.html">Word to PDF: <code>Conversion::wordToPdf</code> — options, bookmarks, return codes and example</a></nav>
+
+<div class="layout">
+
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-title">PDFSolid Conversion SDK</div>
+        <div class="brand-subtitle">PHP API Reference</div>
+    </div>
+    <a class="nav-link" href="index.html">Overview</a>
+    <div class="search"><input data-search type="search" placeholder="Search classes"></div>
+    <div class="nav-section-title">Classes</div>
+    <nav class="nav-list">
+        <a class="nav-link" href="PdfSolidConversion_LibraryManager.html" data-search-item="LibraryManager PdfSolidConversion\LibraryManager">LibraryManager</a>
+    <a class="nav-link active" href="PdfSolidConversion_Conversion.html" data-search-item="Conversion PdfSolidConversion\Conversion">Conversion</a>
+    <a class="nav-link" href="PdfSolidConversion_ConvertOption.html" data-search-item="ConvertOption PdfSolidConversion\ConvertOption">ConvertOption</a>
+    <a class="nav-link" href="PdfSolidConversion_ErrorCode.html" data-search-item="ErrorCode PdfSolidConversion\ErrorCode">ErrorCode</a>
+    <a class="nav-link" href="PdfSolidConversion_OcrLanguage.html" data-search-item="OcrLanguage PdfSolidConversion\OcrLanguage">OcrLanguage</a>
+    <a class="nav-link" href="PdfSolidConversion_OcrOption.html" data-search-item="OcrOption PdfSolidConversion\OcrOption">OcrOption</a>
+    <a class="nav-link" href="PdfSolidConversion_PageLayoutMode.html" data-search-item="PageLayoutMode PdfSolidConversion\PageLayoutMode">PageLayoutMode</a>
+    <a class="nav-link" href="PdfSolidConversion_ImageType.html" data-search-item="ImageType PdfSolidConversion\ImageType">ImageType</a>
+    <a class="nav-link" href="PdfSolidConversion_ImageColorMode.html" data-search-item="ImageColorMode PdfSolidConversion\ImageColorMode">ImageColorMode</a>
+    <a class="nav-link" href="PdfSolidConversion_ExcelWorksheetOption.html" data-search-item="ExcelWorksheetOption PdfSolidConversion\ExcelWorksheetOption">ExcelWorksheetOption</a>
+    <a class="nav-link" href="PdfSolidConversion_HtmlOption.html" data-search-item="HtmlOption PdfSolidConversion\HtmlOption">HtmlOption</a>
+    <a class="nav-link" href="PdfSolidConversion_DocumentAI.html" data-search-item="DocumentAI PdfSolidConversion\DocumentAI">DocumentAI</a>
+    <a class="nav-link" href="PdfSolidConversion_Exception_ConversionException.html" data-search-item="ConversionException PdfSolidConversion\Exception\ConversionException">ConversionException</a>
+    </nav>
+</aside>
+
+<div class="content">
+<header class="hero">
+    <h1>Conversion</h1>
+    <p>PdfSolidConversion\Conversion</p>
+</header>
+<main>
+<p class="muted"><code>PdfSolidConversion\Conversion</code></p>
+<p>High-level wrapper around the CPDF_StartPDFTo* functions. Each method
+returns the raw CSDKErrorCode integer. Use {@see ErrorCode} to interpret
+the value, or call {@see Conversion::convert()} which throws on error.</p>
+<p>Callbacks are not currently exposed; pass NULL to the SDK so all calls run
+synchronously without progress callbacks (matching the Go binding&#x27;s default
+behaviour when no callback is registered).</p>
+<p class="muted">Source: <code>pdfsolid_sdk/php/src/Conversion.php</code></p>
+<div class="pill-row"><span class="pill">0 constants</span><span class="pill">0 properties</span><span class="pill">12 methods</span></div>
+<div class="toc"><a href="#methods">Methods</a></div>
+<h2 id="methods">Methods</h2>
+<section class="member" id="method-pdftoword"><div class="sig"><code>public static function pdfToWord(string $in, string $password, string $out, ?ConvertOption $opt = null): int</code></div></section>
+<section class="member" id="method-pdftortf"><div class="sig"><code>public static function pdfToRtf(string $in, string $password, string $out, ?ConvertOption $opt = null): int</code></div></section>
+<section class="member" id="method-pdftoexcel"><div class="sig"><code>public static function pdfToExcel(string $in, string $password, string $out, ?ConvertOption $opt = null): int</code></div></section>
+<section class="member" id="method-pdftoppt"><div class="sig"><code>public static function pdfToPpt(string $in, string $password, string $out, ?ConvertOption $opt = null): int</code></div></section>
+<section class="member" id="method-pdftohtml"><div class="sig"><code>public static function pdfToHtml(string $in, string $password, string $out, ?ConvertOption $opt = null): int</code></div></section>
+<section class="member" id="method-pdftoimage"><div class="sig"><code>public static function pdfToImage(string $in, string $password, string $out, ?ConvertOption $opt = null): int</code></div></section>
+<section class="member" id="method-pdftosearchablepdf"><div class="sig"><code>public static function pdfToSearchablePdf(string $in, string $password, string $out, ?ConvertOption $opt = null): int</code></div></section>
+<section class="member" id="method-pdftotxt"><div class="sig"><code>public static function pdfToTxt(string $in, string $password, string $out, ?ConvertOption $opt = null): int</code></div></section>
+<section class="member" id="method-pdftojson"><div class="sig"><code>public static function pdfToJson(string $in, string $password, string $out, ?ConvertOption $opt = null): int</code></div></section>
+<section class="member" id="method-pdftomarkdown"><div class="sig"><code>public static function pdfToMarkdown(string $in, string $password, string $out, ?ConvertOption $opt = null): int</code></div></section>
+<section class="member" id="method-pdftoofd"><div class="sig"><code>public static function pdfToOfd(string $in, string $password, string $out, ?ConvertOption $opt = null): int</code></div></section>
+<section class="member" id="method-convert"><div class="sig"><code>public static function convert(string $format, string $in, string $password, string $out, ?ConvertOption $opt = null): void</code></div><p>Convenience wrapper: same as the specific method but throws on failure.</p></section>
+</main>
+</div>
+</div>
+<script src="search.js"></script>
+</body>
+</html>

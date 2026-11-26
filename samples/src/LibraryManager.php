@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Conversion;
+namespace PdfSolidConversion;
 
 use FFI;
 use FFI\CData;
-use Conversion\Exception\ConversionException;
-use Conversion\Internal\FFIFactory;
+use PdfSolidConversion\Exception\ConversionException;
+use PdfSolidConversion\Internal\FFIFactory;
 
 /**
  * Common SDK lifecycle: license verification, initialization, logging,
@@ -27,6 +27,10 @@ final class LibraryManager
         return (int) $ffi->CPDF_LicenseVerify($license, $deviceId, $appId);
     }
 
+    /**
+     * Initialize after successful license verification. Use an empty path on Linux.
+     * The core uses system fonts; load DocumentAI packages separately.
+     */
     public static function initialize(string $resourcePath): void
     {
         $ffi = FFIFactory::ffi();
@@ -68,11 +72,21 @@ final class LibraryManager
     }
 
     /**
-     * Load the DocumentAI model used by OCR, Layout Analysis and Table
-     * Recognition. Must be called after {@see initialize()} and before any
-     * conversion that relies on AI features.
+     * Returns the type of the currently verified license (one of {@see LicenseType})
+     * without verifying again or consuming page quota.
+     */
+    public static function getLicenseType(): int
+    {
+        return (int) FFIFactory::ffi()->CPDF_GetLicenseType();
+    }
+
+    /**
+     * Load one SDK-matching model package after initialize() and while idle.
+     * Successful calls merge capabilities in any order. Failed calls preserve
+     * already loaded capabilities. Check every returned ErrorCode: 0 is success,
+     * and 60 means conversion or release is in progress.
      *
-     * @param string $modelPath Absolute path to the `documentai.model` file.
+     * @param string $modelPath Absolute path to a base or extension .model package.
      * @param int    $gpuId     GPU device index; pass -1 to disable GPU.
      */
     public static function setDocumentAIModel(string $modelPath, int $gpuId = -1): int
@@ -85,9 +99,8 @@ final class LibraryManager
     }
 
     /**
-     * Configure how many concurrent Layout / Table model instances the SDK
-     * keeps in memory. Increase the counts to improve throughput when many
-     * conversions run in parallel.
+     * Configure Layout / Table model instance counts while the SDK is idle.
+     * Increase the counts to improve throughput when conversions run in parallel.
      */
     public static function setDocumentAIModelCount(int $layoutModelCount, int $tableModelCount): void
     {
@@ -95,9 +108,9 @@ final class LibraryManager
     }
 
     /**
-     * Release the DocumentAI model (and its GPU resources) without shutting
-     * down the rest of the SDK. After this call AI features become unavailable
-     * until {@see setDocumentAIModel()} is invoked again.
+     * Release all loaded DocumentAI packages after all conversions finish,
+     * without shutting down the SDK. Load the required packages again through
+     * setDocumentAIModel() before using AI features.
      */
     public static function releaseDocumentAIModel(): void
     {

@@ -1,189 +1,74 @@
-<!doctype html><html lang="en"><meta charset="utf-8"><title>PDFSolid PHP 1.2.0 API</title><style>body{max-width:1080px;margin:40px auto;padding:0 24px;font:16px/1.6 sans-serif;color:#18212b}pre{white-space:pre-wrap;background:#f3f5f7;padding:14px}a{color:#075eb0}h2{margin-top:48px}</style><h1>PDFSolid Conversion SDK for PHP 1.2.0</h1><p>Generated from the PHP classes shipped in this package. Namespace: <code>Conversion\</code>.</p><p><a href="../developer_guide_php.md">Developer guide</a></p><ul><li><a href="#LibraryManager">LibraryManager</a></li><li><a href="#Conversion">Conversion</a></li><li><a href="#ConvertOption">ConvertOption</a></li><li><a href="#ConvertCallback">ConvertCallback</a></li><li><a href="#DocumentAI">DocumentAI</a></li><li><a href="#ErrorCode">ErrorCode</a></li><li><a href="#OcrLanguage">OcrLanguage</a></li><li><a href="#OcrOption">OcrOption</a></li><li><a href="#PageLayoutMode">PageLayoutMode</a></li><li><a href="#ImageType">ImageType</a></li><li><a href="#ImageColorMode">ImageColorMode</a></li><li><a href="#ExcelWorksheetOption">ExcelWorksheetOption</a></li><li><a href="#HtmlOption">HtmlOption</a></li><li><a href="#Exception\ConversionException">Exception\ConversionException</a></li></ul><h2 id="LibraryManager">Conversion\LibraryManager</h2><pre>public static function licenseVerify(string $license, string $deviceId = &#039;&#039;, string $appId = &#039;&#039;): int;
-public static function initialize(string $resourcePath): void;
-public static function release(): void;
-public static function setLogger(bool $enableInfo, bool $enableWarning): void;
-public static function getPageCount(string $filePath, string $password = &#039;&#039;): int;
-public static function getRemainingPageQuota(): int;
-public static function setDocumentAIModel(string $modelPath, int $gpuId = -1): int;
-public static function setDocumentAIModelCount(int $layoutModelCount, int $tableModelCount): void;
-public static function releaseDocumentAIModel(): void;
-public static function getVersion(): string;
-public static function isInitialized(): bool;
-public static function toWString(string $utf8): FFI\CData;
-public static function isWindows(): bool;</pre><h2 id="Conversion">Conversion\Conversion</h2><pre>public static function pdfToWord(string $in, string $password, string $out, Conversion\ConvertOption $opt = NULL, Conversion\ConvertCallback $cb = NULL): int;
-public static function pdfToRtf(string $in, string $password, string $out, Conversion\ConvertOption $opt = NULL, Conversion\ConvertCallback $cb = NULL): int;
-public static function pdfToExcel(string $in, string $password, string $out, Conversion\ConvertOption $opt = NULL, Conversion\ConvertCallback $cb = NULL): int;
-public static function pdfToPpt(string $in, string $password, string $out, Conversion\ConvertOption $opt = NULL, Conversion\ConvertCallback $cb = NULL): int;
-public static function pdfToHtml(string $in, string $password, string $out, Conversion\ConvertOption $opt = NULL, Conversion\ConvertCallback $cb = NULL): int;
-public static function pdfToImage(string $in, string $password, string $out, Conversion\ConvertOption $opt = NULL, Conversion\ConvertCallback $cb = NULL): int;
-public static function pdfToSearchablePdf(string $in, string $password, string $out, Conversion\ConvertOption $opt = NULL, Conversion\ConvertCallback $cb = NULL): int;
-public static function pdfToTxt(string $in, string $password, string $out, Conversion\ConvertOption $opt = NULL, Conversion\ConvertCallback $cb = NULL): int;
-public static function pdfToJson(string $in, string $password, string $out, Conversion\ConvertOption $opt = NULL, Conversion\ConvertCallback $cb = NULL): int;
-public static function pdfToMarkdown(string $in, string $password, string $out, Conversion\ConvertOption $opt = NULL, Conversion\ConvertCallback $cb = NULL): int;
-public static function pdfToOfd(string $in, string $password, string $out, Conversion\ConvertOption $opt = NULL, Conversion\ConvertCallback $cb = NULL): int;
-public static function convert(string $format, string $in, string $password, string $out, Conversion\ConvertOption $opt = NULL, Conversion\ConvertCallback $cb = NULL): void;</pre><h2 id="ConvertOption">Conversion\ConvertOption</h2><pre>public bool $enableAiLayout = false;
-public bool $enableAiTableRecognition = false;
-public bool $containImage = true;
-public bool $containPageBackgroundImage = false;
-public bool $jsonContainTable = false;
-public bool $containAnnotation = false;
-public bool $excelAllContent = false;
-public bool $excelCsvFormat = false;
-public bool $enableOcr = false;
-public bool $enableDocumentOrientationClassification = false;
-public bool $enableDocumentDewarp = false;
-public bool $transparentText = false;
-public bool $txtTableFormat = false;
-public bool $imagePathEnhance = false;
-public bool $formulaToImage = false;
-public bool $autoCreateFolder = true;
-public bool $outputDocumentPerPage = false;
-public float $imageScaling = 1.0;
-public int $pageLayoutMode = 0;
-public int $excelWorksheetOption = 2;
-public int $htmlOption = 0;
-public int $ocrOption = 3;
-public int $imageColorMode = 0;
-public int $imageType = 3;
-public string $fontName = &#039;&#039;;
-public string $pageRanges = &#039;&#039;;
-public array $languages = array (
-);</pre><h2 id="ConvertCallback">Conversion\ConvertCallback</h2><pre>public $onProgress = NULL;
-public $onCancel = NULL;
-public $onOcr = NULL;
-public $onOcrResult = NULL;
-public $onLayout = NULL;
-public $onLayoutResult = NULL;
-public $onTable = NULL;
-public $onTableResult = NULL;
-public function buildCData(FFI $ffi): FFI\CData;</pre><h2 id="DocumentAI">Conversion\DocumentAI</h2><pre>public static function ocr(string $filePath, array $languages = array (
-  0 =&gt; 16,
-)): array;
-public static function layoutAnalysis(string $filePath): array;
-public static function stampDetection(string $filePath): array;
-public static function magicColor(string $filePath, string $outputPath): void;</pre><h2 id="ErrorCode">Conversion\ErrorCode</h2><pre>const SUCCESS = 0;
-const CANCEL = 1;
-const FILE_ERROR = 2;
-const PDF_PASSWORD = 3;
-const PDF_PAGE = 4;
-const PDF_FORMAT = 5;
-const PDF_SECURITY = 6;
-const OUT_OF_MEMORY = 7;
-const IO_ERROR = 8;
-const COMPRESS = 9;
-const LICENSE_INVALID = 20;
-const LICENSE_EXPIRE = 21;
-const LICENSE_UNSUPPORTED_PLATFORM = 22;
-const LICENSE_UNSUPPORTED_ID = 23;
-const LICENSE_UNSUPPORTED_DEVICE = 24;
-const LICENSE_PERMISSION_DENY = 25;
-const LICENSE_UNINITIALIZED = 26;
-const LICENSE_ILLEGAL_ACCESS = 27;
-const LICENSE_FILE_READ_FAILED = 28;
-const LICENSE_OCR_PERMISSION_DENY = 29;
-const LICENSE_CONCURRENCY_EXCEEDED = 30;
-const LICENSE_PAGE_LIMIT_EXCEEDED = 31;
-const LICENSE_QUOTA_CORRUPTED = 32;
-const NO_TABLE = 40;
-const OCR_FAILURE = 41;
-const CONVERTING = 60;
-const INVALID_ARG = 80;
-const INVALID_HANDLE = 81;
-const MODEL_INVALID_FORMAT = 82;
-const MODEL_FUNCTION_UNSUPPORTED = 83;
-const MODEL_FORMAT_UNSUPPORTED = 84;
-const MODEL_SDK_MISMATCH = 85;
-const IMAGE_DATA_EMPTY = 86;
-const IMAGE_WH_ERROR = 87;
-const IMAGE_UNSUPPORTED_FORMAT = 88;
-const IMAGE_INVALID = 89;
-const EXPIRE = 90;
-const MISSING_ARG = 91;
-const LICENSE_UNSUPPORTED_API = 92;
-const LICENSE_MISMATCH = 93;
-const INVALID_TABLE = 94;
-const UNSUPPORTED_FEATURE = 95;
-const UNKNOWN = 100;
-const NAMES = array (
-  0 =&gt; &#039;Success&#039;,
-  1 =&gt; &#039;Cancel&#039;,
-  2 =&gt; &#039;File error&#039;,
-  3 =&gt; &#039;PDF password error&#039;,
-  4 =&gt; &#039;PDF page error&#039;,
-  5 =&gt; &#039;PDF format error&#039;,
-  6 =&gt; &#039;PDF security error&#039;,
-  7 =&gt; &#039;Out of memory&#039;,
-  8 =&gt; &#039;I/O error&#039;,
-  9 =&gt; &#039;Compression error&#039;,
-  20 =&gt; &#039;License invalid&#039;,
-  21 =&gt; &#039;License expired&#039;,
-  22 =&gt; &#039;License unsupported platform&#039;,
-  23 =&gt; &#039;License unsupported ID&#039;,
-  24 =&gt; &#039;License unsupported device&#039;,
-  25 =&gt; &#039;License permission denied&#039;,
-  26 =&gt; &#039;License uninitialized&#039;,
-  27 =&gt; &#039;License illegal access&#039;,
-  28 =&gt; &#039;License file read failed&#039;,
-  29 =&gt; &#039;License OCR permission denied&#039;,
-  30 =&gt; &#039;License concurrency exceeded&#039;,
-  31 =&gt; &#039;License page limit exceeded&#039;,
-  32 =&gt; &#039;License quota corrupted&#039;,
-  40 =&gt; &#039;No table&#039;,
-  41 =&gt; &#039;OCR failure&#039;,
-  60 =&gt; &#039;Converting error&#039;,
-  80 =&gt; &#039;Invalid argument&#039;,
-  81 =&gt; &#039;Invalid handle&#039;,
-  82 =&gt; &#039;Model invalid format&#039;,
-  83 =&gt; &#039;Model function unsupported&#039;,
-  84 =&gt; &#039;Model format unsupported&#039;,
-  85 =&gt; &#039;Model/SDK version mismatch&#039;,
-  86 =&gt; &#039;Image data empty&#039;,
-  87 =&gt; &#039;Image width/height error&#039;,
-  88 =&gt; &#039;Image unsupported format&#039;,
-  89 =&gt; &#039;Image invalid&#039;,
-  90 =&gt; &#039;Expired&#039;,
-  91 =&gt; &#039;Missing argument&#039;,
-  92 =&gt; &#039;License unsupported API&#039;,
-  93 =&gt; &#039;License mismatch&#039;,
-  94 =&gt; &#039;Invalid table&#039;,
-  95 =&gt; &#039;Unsupported document feature&#039;,
-  100 =&gt; &#039;Unknown error&#039;,
-);
-public static function describe(int $code): string;
-public static function isSuccess(int $code): bool;</pre><h2 id="OcrLanguage">Conversion\OcrLanguage</h2><pre>const UNKNOWN = 0;
-const CHINESE = 1;
-const CHINESE_TRA = 2;
-const ENGLISH = 3;
-const KOREAN = 4;
-const JAPANESE = 5;
-const LATIN = 6;
-const DEVANAGARI = 7;
-const CYRILLIC = 8;
-const ARABIC = 9;
-const TAMIL = 10;
-const TELUGU = 11;
-const KANNADA = 12;
-const THAI = 13;
-const GREEK = 14;
-const ESLAV = 15;
-const AUTO = 16;</pre><h2 id="OcrOption">Conversion\OcrOption</h2><pre>const INVALID_CHARACTER = 0;
-const SCAN_PAGE = 1;
-const INVALID_CHARACTER_AND_SCAN_PAGE = 2;
-const ALL = 3;</pre><h2 id="PageLayoutMode">Conversion\PageLayoutMode</h2><pre>const BOX = 0;
-const FLOW = 1;</pre><h2 id="ImageType">Conversion\ImageType</h2><pre>const JPG = 0;
-const JPEG = 1;
-const JPEG2000 = 2;
-const PNG = 3;
-const BMP = 4;
-const TIFF = 5;
-const TGA = 6;
-const GIF = 7;
-const WEBP = 8;</pre><h2 id="ImageColorMode">Conversion\ImageColorMode</h2><pre>const COLOR = 0;
-const GRAY = 1;
-const BINARY = 2;</pre><h2 id="ExcelWorksheetOption">Conversion\ExcelWorksheetOption</h2><pre>const FOR_TABLE = 0;
-const FOR_PAGE = 1;
-const FOR_DOCUMENT = 2;</pre><h2 id="HtmlOption">Conversion\HtmlOption</h2><pre>const SINGLE_PAGE = 0;
-const SINGLE_PAGE_WITH_BOOKMARK = 1;
-const MULTI_PAGE = 2;
-const MULTI_PAGE_WITH_BOOKMARK = 3;</pre><h2 id="Exception\ConversionException">Conversion\Exception\ConversionException</h2><pre>public function __construct(string $message, int $sdkCode = 0, Throwable $previous = NULL);
-public function getErrorCode(): int;</pre></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDFSolid Conversion SDK for PHP API Reference</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav aria-label="Conversion API" style="padding:.5rem 1rem"><a href="word_to_pdf.html">Word to PDF: <code>Conversion::wordToPdf</code> — options, bookmarks, return codes and example</a></nav>
+
+<div class="layout">
+
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-title">PDFSolid Conversion SDK</div>
+        <div class="brand-subtitle">PHP API Reference</div>
+    </div>
+    <a class="nav-link active" href="index.html">Overview</a>
+    <div class="search"><input data-search type="search" placeholder="Search classes"></div>
+    <div class="nav-section-title">Classes</div>
+    <nav class="nav-list">
+        <a class="nav-link" href="PdfSolidConversion_LibraryManager.html" data-search-item="LibraryManager PdfSolidConversion\LibraryManager">LibraryManager</a>
+    <a class="nav-link" href="PdfSolidConversion_Conversion.html" data-search-item="Conversion PdfSolidConversion\Conversion">Conversion</a>
+    <a class="nav-link" href="PdfSolidConversion_ConvertOption.html" data-search-item="ConvertOption PdfSolidConversion\ConvertOption">ConvertOption</a>
+    <a class="nav-link" href="PdfSolidConversion_ErrorCode.html" data-search-item="ErrorCode PdfSolidConversion\ErrorCode">ErrorCode</a>
+    <a class="nav-link" href="PdfSolidConversion_OcrLanguage.html" data-search-item="OcrLanguage PdfSolidConversion\OcrLanguage">OcrLanguage</a>
+    <a class="nav-link" href="PdfSolidConversion_OcrOption.html" data-search-item="OcrOption PdfSolidConversion\OcrOption">OcrOption</a>
+    <a class="nav-link" href="PdfSolidConversion_PageLayoutMode.html" data-search-item="PageLayoutMode PdfSolidConversion\PageLayoutMode">PageLayoutMode</a>
+    <a class="nav-link" href="PdfSolidConversion_ImageType.html" data-search-item="ImageType PdfSolidConversion\ImageType">ImageType</a>
+    <a class="nav-link" href="PdfSolidConversion_ImageColorMode.html" data-search-item="ImageColorMode PdfSolidConversion\ImageColorMode">ImageColorMode</a>
+    <a class="nav-link" href="PdfSolidConversion_ExcelWorksheetOption.html" data-search-item="ExcelWorksheetOption PdfSolidConversion\ExcelWorksheetOption">ExcelWorksheetOption</a>
+    <a class="nav-link" href="PdfSolidConversion_HtmlOption.html" data-search-item="HtmlOption PdfSolidConversion\HtmlOption">HtmlOption</a>
+    <a class="nav-link" href="PdfSolidConversion_DocumentAI.html" data-search-item="DocumentAI PdfSolidConversion\DocumentAI">DocumentAI</a>
+    <a class="nav-link" href="PdfSolidConversion_Exception_ConversionException.html" data-search-item="ConversionException PdfSolidConversion\Exception\ConversionException">ConversionException</a>
+    </nav>
+</aside>
+
+<div class="content">
+<header class="hero">
+    <h1>PDFSolid Conversion SDK for PHP API Reference</h1>
+    <p>Generated public API documentation for the PHP FFI binding.</p>
+</header>
+<main>
+
+<p>This API reference documents the public PHP surface of PDFSolid Conversion SDK for PHP. Internal FFI bindings and native bridge implementation files are intentionally excluded.</p>
+<div class="pill-row">
+  <span class="pill">13 public classes</span>
+  <span class="pill">Internal FFI excluded</span>
+  <span class="pill">Generated from pdfsolid_sdk/php/src</span>
+</div>
+<h2>Classes</h2>
+<div class="grid">
+<article class="card" data-search-item="LibraryManager PdfSolidConversion\LibraryManager"><h2><a href="PdfSolidConversion_LibraryManager.html">LibraryManager</a></h2><p class="muted"><code>PdfSolidConversion\LibraryManager</code></p><div class="pill-row"><span class="pill">0 constants</span><span class="pill">0 properties</span><span class="pill">10 methods</span></div><p>Common SDK lifecycle: license verification, initialization, logging,</p></article>
+<article class="card" data-search-item="Conversion PdfSolidConversion\Conversion"><h2><a href="PdfSolidConversion_Conversion.html">Conversion</a></h2><p class="muted"><code>PdfSolidConversion\Conversion</code></p><div class="pill-row"><span class="pill">0 constants</span><span class="pill">0 properties</span><span class="pill">12 methods</span></div><p>High-level wrapper for PDF conversions and <a href="word_to_pdf.html">DOCX to PDF</a>.</p></article>
+<article class="card" data-search-item="ConvertOption PdfSolidConversion\ConvertOption"><h2><a href="PdfSolidConversion_ConvertOption.html">ConvertOption</a></h2><p class="muted"><code>PdfSolidConversion\ConvertOption</code></p><div class="pill-row"><span class="pill">0 constants</span><span class="pill">25 properties</span><span class="pill">0 methods</span></div><p>High-level mirror of CConvertOption. Use the public properties to configure</p></article>
+<article class="card" data-search-item="ErrorCode PdfSolidConversion\ErrorCode"><h2><a href="PdfSolidConversion_ErrorCode.html">ErrorCode</a></h2><p class="muted"><code>PdfSolidConversion\ErrorCode</code></p><div class="pill-row"><span class="pill">39 constants</span><span class="pill">0 properties</span><span class="pill">2 methods</span></div><p>CSDKErrorCode mirror —.</p></article>
+<article class="card" data-search-item="OcrLanguage PdfSolidConversion\OcrLanguage"><h2><a href="PdfSolidConversion_OcrLanguage.html">OcrLanguage</a></h2><p class="muted"><code>PdfSolidConversion\OcrLanguage</code></p><div class="pill-row"><span class="pill">17 constants</span><span class="pill">0 properties</span><span class="pill">0 methods</span></div><p>Public API class.</p></article>
+<article class="card" data-search-item="OcrOption PdfSolidConversion\OcrOption"><h2><a href="PdfSolidConversion_OcrOption.html">OcrOption</a></h2><p class="muted"><code>PdfSolidConversion\OcrOption</code></p><div class="pill-row"><span class="pill">4 constants</span><span class="pill">0 properties</span><span class="pill">0 methods</span></div><p>Public API class.</p></article>
+<article class="card" data-search-item="PageLayoutMode PdfSolidConversion\PageLayoutMode"><h2><a href="PdfSolidConversion_PageLayoutMode.html">PageLayoutMode</a></h2><p class="muted"><code>PdfSolidConversion\PageLayoutMode</code></p><div class="pill-row"><span class="pill">2 constants</span><span class="pill">0 properties</span><span class="pill">0 methods</span></div><p>Public API class.</p></article>
+<article class="card" data-search-item="ImageType PdfSolidConversion\ImageType"><h2><a href="PdfSolidConversion_ImageType.html">ImageType</a></h2><p class="muted"><code>PdfSolidConversion\ImageType</code></p><div class="pill-row"><span class="pill">9 constants</span><span class="pill">0 properties</span><span class="pill">0 methods</span></div><p>Public API class.</p></article>
+<article class="card" data-search-item="ImageColorMode PdfSolidConversion\ImageColorMode"><h2><a href="PdfSolidConversion_ImageColorMode.html">ImageColorMode</a></h2><p class="muted"><code>PdfSolidConversion\ImageColorMode</code></p><div class="pill-row"><span class="pill">3 constants</span><span class="pill">0 properties</span><span class="pill">0 methods</span></div><p>Public API class.</p></article>
+<article class="card" data-search-item="ExcelWorksheetOption PdfSolidConversion\ExcelWorksheetOption"><h2><a href="PdfSolidConversion_ExcelWorksheetOption.html">ExcelWorksheetOption</a></h2><p class="muted"><code>PdfSolidConversion\ExcelWorksheetOption</code></p><div class="pill-row"><span class="pill">3 constants</span><span class="pill">0 properties</span><span class="pill">0 methods</span></div><p>Public API class.</p></article>
+<article class="card" data-search-item="HtmlOption PdfSolidConversion\HtmlOption"><h2><a href="PdfSolidConversion_HtmlOption.html">HtmlOption</a></h2><p class="muted"><code>PdfSolidConversion\HtmlOption</code></p><div class="pill-row"><span class="pill">4 constants</span><span class="pill">0 properties</span><span class="pill">0 methods</span></div><p>Public API class.</p></article>
+<article class="card" data-search-item="DocumentAI PdfSolidConversion\DocumentAI"><h2><a href="PdfSolidConversion_DocumentAI.html">DocumentAI</a></h2><p class="muted"><code>PdfSolidConversion\DocumentAI</code></p><div class="pill-row"><span class="pill">0 constants</span><span class="pill">0 properties</span><span class="pill">4 methods</span></div><p>Thin wrapper over the document-AI C entrypoints. Each method returns plain</p></article>
+<article class="card" data-search-item="ConversionException PdfSolidConversion\Exception\ConversionException"><h2><a href="PdfSolidConversion_Exception_ConversionException.html">ConversionException</a></h2><p class="muted"><code>PdfSolidConversion\Exception\ConversionException</code></p><div class="pill-row"><span class="pill">0 constants</span><span class="pill">0 properties</span><span class="pill">1 methods</span></div><p>Public API class.</p></article>
+</div>
+
+</main>
+</div>
+</div>
+<script src="search.js"></script>
+</body>
+</html>

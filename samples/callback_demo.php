@@ -2,18 +2,18 @@
 declare(strict_types=1);
 
 // Demonstrates the new ConvertCallback (progress + cancel) and the
-// DocumentAI model lifecycle helpers exposed in PHP SDK v4.1.0+.
+// DocumentAI model lifecycle helpers exposed in PHP SDK v1.1.0+.
 //
 // Usage:
-//   samples/compdfphp samples/callback_demo.php
+//   samples/pdfsolidphp samples/callback_demo.php
 
 require __DIR__ . '/autoload.php';
 
-use Conversion\Conversion;
-use Conversion\ConvertCallback;
-use Conversion\ConvertOption;
-use Conversion\ErrorCode;
-use Conversion\LibraryManager;
+use PdfSolidConversion\Conversion;
+use PdfSolidConversion\ConvertCallback;
+use PdfSolidConversion\ConvertOption;
+use PdfSolidConversion\ErrorCode;
+use PdfSolidConversion\LibraryManager;
 
 $resource = dirname(__DIR__);
 $input    = __DIR__ . '/input_files/word.pdf';
@@ -22,7 +22,7 @@ $outputB  = __DIR__ . '/output_files/callback_cancelled.docx';
 
 @mkdir(dirname($outputA), 0777, true);
 
-$rc = LibraryManager::licenseVerify(__DIR__ . '/license.xml');
+$rc = LibraryManager::licenseVerify(dirname(__DIR__) . '/resource/license/license.xml');
 if (!ErrorCode::isSuccess($rc)) {
     fwrite(STDERR, 'License verify failed: ' . ErrorCode::describe($rc) . PHP_EOL);
     exit(1);

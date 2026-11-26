@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ConvertCallback</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="layout">
+
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-title">PDFSolid Conversion SDK</div>
+        <div class="brand-subtitle">PHP API Reference</div>
+    </div>
+    <a class="nav-link" href="index.html">Overview</a>
+    <div class="search"><input data-search type="search" placeholder="Search classes"></div>
+    <div class="nav-section-title">Classes</div>
+    <nav class="nav-list">
+    <a class="nav-link" href="PdfSolidConversion_LibraryManager.html" data-search-item="LibraryManager">LibraryManager</a>
+    <a class="nav-link" href="PdfSolidConversion_Conversion.html" data-search-item="Conversion">Conversion</a>
+    <a class="nav-link" href="PdfSolidConversion_ConvertOption.html" data-search-item="ConvertOption">ConvertOption</a>
+    <a class="nav-link active" href="PdfSolidConversion_ConvertCallback.html" data-search-item="ConvertCallback">ConvertCallback</a>
+    <a class="nav-link" href="PdfSolidConversion_ErrorCode.html" data-search-item="ErrorCode">ErrorCode</a>
+    <a class="nav-link" href="PdfSolidConversion_LicenseType.html" data-search-item="LicenseType">LicenseType</a>
+    <a class="nav-link" href="PdfSolidConversion_TableRecognitionAccuracy.html" data-search-item="TableRecognitionAccuracy">TableRecognitionAccuracy</a>
+    <a class="nav-link" href="PdfSolidConversion_OcrLanguage.html" data-search-item="OcrLanguage">OcrLanguage</a>
+    <a class="nav-link" href="PdfSolidConversion_OcrOption.html" data-search-item="OcrOption">OcrOption</a>
+    <a class="nav-link" href="PdfSolidConversion_PageLayoutMode.html" data-search-item="PageLayoutMode">PageLayoutMode</a>
+    <a class="nav-link" href="PdfSolidConversion_ImageType.html" data-search-item="ImageType">ImageType</a>
+    <a class="nav-link" href="PdfSolidConversion_ImageColorMode.html" data-search-item="ImageColorMode">ImageColorMode</a>
+    <a class="nav-link" href="PdfSolidConversion_ExcelWorksheetOption.html" data-search-item="ExcelWorksheetOption">ExcelWorksheetOption</a>
+    <a class="nav-link" href="PdfSolidConversion_HtmlOption.html" data-search-item="HtmlOption">HtmlOption</a>
+    <a class="nav-link" href="PdfSolidConversion_DocumentAI.html" data-search-item="DocumentAI">DocumentAI</a>
+    <a class="nav-link" href="PdfSolidConversion_Exception_ConversionException.html" data-search-item="ConversionException">ConversionException</a>
+    <a class="nav-link" href="PdfSolidConversion_WordPdfBookmarkMode.html" data-search-item="WordPdfBookmarkMode">WordPdfBookmarkMode</a>
+    </nav>
+</aside>
+
+<div class="content">
+<header class="hero">
+    <h1>ConvertCallback</h1>
+    <p>PdfSolidConversion\ConvertCallback</p>
+</header>
+<main><p>Optional callbacks passed to conversion methods. Callbacks execute synchronously on the calling thread; unset properties use the built-in behavior. Keep the callback object alive until conversion returns.</p>
+<p><code>onProgress</code> reports the current and total pages; return <code>true</code> from <code>onCancel</code> to request cancellation. Configure custom AI callbacks in pairs (an incomplete pair raises an argument error): <code>onOcr/onOcrResult</code>, <code>onLayout/onLayoutResult</code>, or <code>onTable/onTableResult</code>. The trigger receives the page image path and returns <code>true</code> when handled; the matching result callback returns the SDK-defined JSON result for that image, or <code>null</code> on failure. See the developer guide and delivered <code>samples/callback_demo.php</code> for schemas and examples.</p>
+<section class="member" id="property-onprogress"><div class="sig"><code>onProgress: function (int $currentPage, int $totalPage): void</code></div></section>
+<section class="member" id="property-oncancel"><div class="sig"><code>onCancel: function (): bool</code></div></section>
+<section class="member" id="property-onocr"><div class="sig"><code>onOcr: function (string $imagePath): bool</code></div></section>
+<section class="member" id="property-onocrresult"><div class="sig"><code>onOcrResult: function (): string</code></div></section>
+<section class="member" id="property-onlayout"><div class="sig"><code>onLayout: function (string $imagePath): bool</code></div></section>
+<section class="member" id="property-onlayoutresult"><div class="sig"><code>onLayoutResult: function (): string</code></div></section>
+<section class="member" id="property-ontable"><div class="sig"><code>onTable: function (string $imagePath): bool</code></div></section>
+<section class="member" id="property-ontableresult"><div class="sig"><code>onTableResult: function (): string</code></div></section>
+<p>Callback exceptions request cancellation and are rethrown after native conversion returns. The binding retains result buffers for the synchronous call and releases them afterwards.</p>
+</main>
+</div>
+</div>
+<script src="search.js"></script>
+</body>
+</html>

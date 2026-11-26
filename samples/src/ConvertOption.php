@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Conversion;
+namespace PdfSolidConversion;
 
 /**
  * High-level mirror of CConvertOption. Use the public properties to configure
@@ -11,6 +11,8 @@ class ConvertOption
 {
     public bool $enableAiLayout = false;
     public bool $enableAiTableRecognition = false;
+    /** @var int One of {@see TableRecognitionAccuracy}. */
+    public int $tableRecognitionAccuracy = TableRecognitionAccuracy::BALANCED;
     public bool $containImage = true;
     public bool $containPageBackgroundImage = false;
     public bool $jsonContainTable = false;
@@ -20,6 +22,12 @@ class ConvertOption
     public bool $enableOcr = false;
     public bool $enableDocumentOrientationClassification = false;
     public bool $enableDocumentDewarp = false;
+    /** Size the output page from an image input's own resolution, matched to the nearest standard paper. */
+    public bool $enableAutoPageSize = false;
+    /** Output page width in points for image input; set with customPageHeight to choose the page outright. */
+    public float $customPageWidth = 0.0;
+    /** Output page height in points for image input. */
+    public float $customPageHeight = 0.0;
     public bool $transparentText = false;
     public bool $txtTableFormat = false;
     public bool $imagePathEnhance = false;
@@ -44,6 +52,8 @@ class ConvertOption
 
     public string $fontName = '';
     public string $pageRanges = '';
+    /** @var int One of {@see WordPdfBookmarkMode}; only applies to Word to PDF. */
+    public int $wordPdfBookmarkMode = WordPdfBookmarkMode::NONE;
 
     /** @var int[] List of OCR languages (values from {@see OcrLanguage}). */
     public array $languages = [];

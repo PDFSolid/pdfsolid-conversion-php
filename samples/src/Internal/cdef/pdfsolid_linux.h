@@ -2,10 +2,10 @@
 //
 // This file is consumed by PHP FFI::cdef(). It MUST NOT contain preprocessor
 // directives other than FFI_* ones, calling-convention macros, attributes,
-// or extern "C" blocks. Keep this file aligned with compdf_sdk/c/*_c.h.
+// or extern "C" blocks. Keep this file aligned with python/include/*_c.h.
 
 #define FFI_SCOPE "PDFSOLID_CONVERSION"
-#define FFI_LIB "libcompdf_php_shim.so"
+#define FFI_LIB "libpdfsolid_php_shim.so"
 
 typedef _Bool bool;
 
@@ -139,6 +139,11 @@ typedef struct CConvertOption {
     int* languages;                 // COCRLanguage*
     bool enable_document_orientation_classification;
     bool enable_document_dewarp;
+    bool enable_auto_page_size;
+    float custom_page_width;
+    float custom_page_height;
+    int table_recognition_accuracy; // CTableRecognitionAccuracy
+    int word_pdf_bookmark_mode;     // CWordPdfBookmarkMode, only used by Word to PDF
 } CConvertOption;
 
 // ---------------------------------------------------------------------------
@@ -278,6 +283,7 @@ void          CPDF_Initialize(const char* resource_path);
 void          CPDF_SetLogger(bool enable_info, bool enable_warning);
 int           CPDF_GetPageCount(const char* file_path, const char* password);
 int           CPDF_GetRemainingPageQuota(void);
+int           CPDF_GetLicenseType(void);
 void          CPDF_GetVersion(char* version);
 void          CPDF_Release(void);
 
@@ -286,21 +292,20 @@ void          CPDF_ReleaseDocumentAIModel(void);
 void          CPDF_SetDocumentAIModelCount(int layout_model_count, int table_model_count);
 
 // ---------------------------------------------------------------------------
-// PHP shim API. The SDK takes CConvertOption by value; these distinct shim
-// symbols accept a pointer and forward using the current SDK headers.
+// Conversion API (pdfsolid_conversion_c.h)
 // ---------------------------------------------------------------------------
 
-CSDKErrorCode pdfsolid_php_convert_word(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
-CSDKErrorCode pdfsolid_php_convert_rtf(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
-CSDKErrorCode pdfsolid_php_convert_excel(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
-CSDKErrorCode pdfsolid_php_convert_ppt(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
-CSDKErrorCode pdfsolid_php_convert_html(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
-CSDKErrorCode pdfsolid_php_convert_image(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
-CSDKErrorCode pdfsolid_php_convert_searchablepdf(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
-CSDKErrorCode pdfsolid_php_convert_txt(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
-CSDKErrorCode pdfsolid_php_convert_json(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
-CSDKErrorCode pdfsolid_php_convert_markdown(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
-CSDKErrorCode pdfsolid_php_convert_ofd(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_start_pdf_to_word(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_start_pdf_to_rtf(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_start_pdf_to_excel(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_start_pdf_to_ppt(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_start_pdf_to_html(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_start_pdf_to_image(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_start_pdf_to_searchablepdf(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_start_pdf_to_txt(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_start_pdf_to_json(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_start_pdf_to_markdown(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
+CSDKErrorCode pdfsolid_php_start_pdf_to_ofd(const char* file_path, const char* password, const char* output_path, const CConvertOption* options, CConvertCallback* callback);
 
 // ---------------------------------------------------------------------------
 // Document AI API (conversion_document_ai_c.h)
@@ -319,3 +324,5 @@ void CPDF_LayoutAnalysisRelease(da_detection_t* detection_result);
 void CPDF_TableRecRelease(da_table_t** table_result, int table_count);
 void CPDF_DewarpRelease(da_dewarp_t* doc);
 void CPDF_StampDetectionRelease(da_detection_t* detection_result);
+
+CSDKErrorCode pdfsolid_php_start_word_to_pdf(const char* file_path, const char* output_path, const CConvertOption* options, CConvertCallback* callback, char* diagnostics);

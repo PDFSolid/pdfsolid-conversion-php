@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Conversion;
+namespace PdfSolidConversion;
 
 /**
  * CSDKErrorCode mirror. Keep in sync with samples/src/Internal/cdef/*.h.

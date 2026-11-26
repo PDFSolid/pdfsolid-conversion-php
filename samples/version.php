@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/autoload.php';
 
-use Conversion\LibraryManager;
+use PdfSolidConversion\LibraryManager;
 
 echo 'SDK version: ' . LibraryManager::getVersion() . PHP_EOL;
 echo 'Remaining quota: ' . LibraryManager::getRemainingPageQuota() . PHP_EOL;

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DocumentAI</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="layout">
+
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-title">PDFSolid Conversion SDK</div>
+        <div class="brand-subtitle">PHP API Reference</div>
+    </div>
+    <a class="nav-link" href="index.html">Overview</a>
+    <div class="search"><input data-search type="search" placeholder="Search classes"></div>
+    <div class="nav-section-title">Classes</div>
+    <nav class="nav-list">
+        <a class="nav-link" href="PdfSolidConversion_LibraryManager.html" data-search-item="LibraryManager PdfSolidConversion\LibraryManager">LibraryManager</a>
+    <a class="nav-link" href="PdfSolidConversion_Conversion.html" data-search-item="Conversion PdfSolidConversion\Conversion">Conversion</a>
+    <a class="nav-link" href="PdfSolidConversion_ConvertOption.html" data-search-item="ConvertOption PdfSolidConversion\ConvertOption">ConvertOption</a>
+    <a class="nav-link" href="PdfSolidConversion_ErrorCode.html" data-search-item="ErrorCode PdfSolidConversion\ErrorCode">ErrorCode</a>
+    <a class="nav-link" href="PdfSolidConversion_OcrLanguage.html" data-search-item="OcrLanguage PdfSolidConversion\OcrLanguage">OcrLanguage</a>
+    <a class="nav-link" href="PdfSolidConversion_OcrOption.html" data-search-item="OcrOption PdfSolidConversion\OcrOption">OcrOption</a>
+    <a class="nav-link" href="PdfSolidConversion_PageLayoutMode.html" data-search-item="PageLayoutMode PdfSolidConversion\PageLayoutMode">PageLayoutMode</a>
+    <a class="nav-link" href="PdfSolidConversion_ImageType.html" data-search-item="ImageType PdfSolidConversion\ImageType">ImageType</a>
+    <a class="nav-link" href="PdfSolidConversion_ImageColorMode.html" data-search-item="ImageColorMode PdfSolidConversion\ImageColorMode">ImageColorMode</a>
+    <a class="nav-link" href="PdfSolidConversion_ExcelWorksheetOption.html" data-search-item="ExcelWorksheetOption PdfSolidConversion\ExcelWorksheetOption">ExcelWorksheetOption</a>
+    <a class="nav-link" href="PdfSolidConversion_HtmlOption.html" data-search-item="HtmlOption PdfSolidConversion\HtmlOption">HtmlOption</a>
+    <a class="nav-link active" href="PdfSolidConversion_DocumentAI.html" data-search-item="DocumentAI PdfSolidConversion\DocumentAI">DocumentAI</a>
+    <a class="nav-link" href="PdfSolidConversion_Exception_ConversionException.html" data-search-item="ConversionException PdfSolidConversion\Exception\ConversionException">ConversionException</a>
+    </nav>
+</aside>
+
+<div class="content">
+<header class="hero">
+    <h1>DocumentAI</h1>
+    <p>PdfSolidConversion\DocumentAI</p>
+</header>
+<main>
+<p class="muted"><code>PdfSolidConversion\DocumentAI</code></p>
+<p>Thin wrapper over the document-AI C entrypoints. Each method returns plain
+PHP arrays/values and takes care of releasing the underlying native buffers
+via the corresponding CPDF_*Release function.</p>
+<p>Mirrors the document_ai module of the Python SDK.</p>
+<p class="muted">Source: <code>pdfsolid_sdk/php/src/DocumentAI.php</code></p>
+<div class="pill-row"><span class="pill">0 constants</span><span class="pill">0 properties</span><span class="pill">4 methods</span></div>
+<div class="toc"><a href="#methods">Methods</a></div>
+<h2 id="methods">Methods</h2>
+<section class="member" id="method-ocr"><div class="sig"><code>public static function ocr(string $filePath, array $languages = [OcrLanguage::AUTO]): array</code></div><p>Run OCR on a PDF file. Returns an array of records:
+  [[&#x27;text&#x27; =&gt; string, &#x27;confidence&#x27; =&gt; float, &#x27;font_size&#x27; =&gt; float,
+    &#x27;bbox&#x27; =&gt; [l,t,r,b], &#x27;color&#x27; =&gt; [r,g,b]], ..]</p></section>
+<section class="member" id="method-layoutanalysis"><div class="sig"><code>public static function layoutAnalysis(string $filePath): array</code></div><p>Detect page-layout regions. Returns [[&#x27;object&#x27; =&gt; string, &#x27;rect&#x27; =&gt; [l,t,r,b],
+&#x27;confidence&#x27; =&gt; float], ..].</p></section>
+<section class="member" id="method-stampdetection"><div class="sig"><code>public static function stampDetection(string $filePath): array</code></div><p>Detect stamps in a PDF. Same shape as layoutAnalysis().</p></section>
+<section class="member" id="method-magiccolor"><div class="sig"><code>public static function magicColor(string $filePath, string $outputPath): void</code></div></section>
+</main>
+</div>
+</div>
+<script src="search.js"></script>
+</body>
+</html>

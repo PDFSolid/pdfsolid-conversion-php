@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Conversion;
+namespace PdfSolidConversion;
 
 use FFI;
 use FFI\CData;
-use Conversion\Exception\ConversionException;
-use Conversion\Internal\FFIFactory;
+use PdfSolidConversion\Exception\ConversionException;
+use PdfSolidConversion\Internal\FFIFactory;
 
 /**
  * Thin wrapper over the document-AI C entrypoints. Each method returns plain

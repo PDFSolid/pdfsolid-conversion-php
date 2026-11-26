@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Conversion\Exception;
+namespace PdfSolidConversion\Exception;
 
 class ConversionException extends \RuntimeException
 {

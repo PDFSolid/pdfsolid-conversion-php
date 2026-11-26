@@ -1,28 +1,28 @@
 <?php
 declare(strict_types=1);
 
-namespace Conversion;
+namespace PdfSolidConversion;
 
 use FFI;
 use FFI\CData;
 
 /**
  * High-level holder for the optional native callbacks accepted by every
- * `CPDF_StartPDFTo*` function. Equivalent to the C `CConvertCallback` struct
+ * native conversion function. Equivalent to the C `CConvertCallback` struct
  * (see `pdfsolid_config_macros.h` in the SDK release headers).
  *
- * Assign any subset of callables; unset slots are reported to the SDK as
- * `NULL`, restoring the built-in behaviour for that hook.
+ * Set AI trigger/result callbacks in pairs; unset AI pairs restore the
+ * built-in behaviour. Progress and cancellation are independently optional.
  *
  * Signatures (all PHP callables):
  * - $onProgress    : function (int $currentPage, int $totalPage): void
  * - $onCancel      : function (): bool                    // true cancels the job
  * - $onOcr         : function (string $imagePath): bool   // true delegates OCR to caller
- * - $onOcrResult   : function (): string                  // JSON for the last image
+ * - $onOcrResult   : function (): ?string                  // JSON for the last image
  * - $onLayout      : function (string $imagePath): bool
- * - $onLayoutResult: function (): string
+ * - $onLayoutResult: function (): ?string
  * - $onTable       : function (string $imagePath): bool
- * - $onTableResult : function (): string
+ * - $onTableResult : function (): ?string
  *
  * All callbacks are invoked synchronously from the same OS thread that called
  * the conversion function — PHP FFI does not support cross-thread callbacks.
@@ -41,8 +41,38 @@ final class ConvertCallback
     /** @var array<int,mixed> Trampolines kept alive for the SDK call. */
     private array $_keepAlive = [];
 
-    /** @var array<int,CData> char[] buffers returned by get_*_result hooks. */
+    /** @var array<string,CData> char[] buffers returned by get_*_result hooks. */
     private array $_resultBuffers = [];
+
+    private ?\Throwable $_error = null;
+
+    /** Rethrow only after the synchronous native conversion returns. */
+    public function throwPendingException(): void
+    {
+        if ($this->_error !== null) {
+            throw $this->_error;
+        }
+    }
+
+    /** Release per-call buffers and break trampoline reference cycles. */
+    public function releaseNativeResources(): void
+    {
+        $this->_keepAlive = [];
+        $this->_resultBuffers = [];
+    }
+
+    private function invoke($callable, array $args, $fallback)
+    {
+        if ($this->_error !== null) {
+            return $fallback;
+        }
+        try {
+            return $callable(...$args);
+        } catch (\Throwable $error) {
+            $this->_error = $error;
+            return $fallback;
+        }
+    }
 
     /**
      * Build a native `CConvertCallback` cdata. The PHP caller MUST keep both
@@ -52,7 +82,13 @@ final class ConvertCallback
      */
     public function buildCData(FFI $ffi): CData
     {
+        foreach ([['onOcr', 'onOcrResult'], ['onLayout', 'onLayoutResult'], ['onTable', 'onTableResult']] as $pair) {
+            if (($this->{$pair[0]} === null) !== ($this->{$pair[1]} === null)) {
+                throw new \InvalidArgumentException('Custom AI callbacks require both trigger and result');
+            }
+        }
         // Reset state for a fresh native call.
+        $this->_error = null;
         $this->_keepAlive = [];
         $this->_resultBuffers = [];
 
@@ -70,20 +106,20 @@ final class ConvertCallback
         if ($this->onProgress !== null) {
             $fn = $this->onProgress;
             $t = function (int $current, int $total) use ($fn): void {
-                ($fn)($current, $total);
+                $this->invoke($fn, [$current, $total], null);
             };
             $cb->progress = $t;
             $this->_keepAlive[] = $t;
         }
 
-        if ($this->onCancel !== null) {
-            $fn = $this->onCancel;
-            $t = function () use ($fn): bool {
-                return (bool) ($fn)();
-            };
-            $cb->cancel = $t;
-            $this->_keepAlive[] = $t;
-        }
+        // Always allow an exception in another hook to request cancellation.
+        $fn = $this->onCancel;
+        $t = function () use ($fn): bool {
+            $cancel = $fn !== null ? (bool) $this->invoke($fn, [], true) : false;
+            return $cancel || $this->_error !== null;
+        };
+        $cb->cancel = $t;
+        $this->_keepAlive[] = $t;
 
         $this->bindTrigger($cb, 'ocr', $this->onOcr);
         $this->bindTrigger($cb, 'layout', $this->onLayout);
@@ -102,8 +138,14 @@ final class ConvertCallback
             return;
         }
         $t = function ($imagePath) use ($callable): bool {
-            $path = $imagePath === null ? '' : FFI::string($imagePath);
-            return (bool) ($callable)($path);
+            $path = is_string($imagePath) ? $imagePath : ($imagePath === null ? '' : FFI::string($imagePath));
+            return $this->invoke(function () use ($callable, $path): bool {
+                $value = $callable($path);
+                if (!is_bool($value)) {
+                    throw new \UnexpectedValueException('AI trigger callback must return a boolean');
+                }
+                return $value;
+            }, [], false);
         };
         $cb->{$field} = $t;
         $this->_keepAlive[] = $t;
@@ -114,17 +156,25 @@ final class ConvertCallback
         if ($callable === null) {
             return;
         }
-        $buffers = &$this->_resultBuffers;
-        $t = function () use ($callable, &$buffers): CData {
-            $json = (string) ($callable)();
-            $len = strlen($json);
-            $buf = FFI::new('char[' . ($len + 1) . ']', false);
-            if ($len > 0) {
-                FFI::memcpy($buf, $json, $len);
-            }
-            $buf[$len] = "\0";
-            $buffers[] = $buf; // keep alive for the SDK to read
-            return FFI::cast('const char*', FFI::addr($buf[0]));
+        $t = function () use ($callable, $field): ?CData {
+            return $this->invoke(function () use ($callable, $field): ?CData {
+                $json = $callable();
+                unset($this->_resultBuffers[$field]);
+                if ($json === null) {
+                    return null;
+                }
+                if (!is_string($json) || strpos($json, "\0") !== false) {
+                    throw new \UnexpectedValueException('AI result callback must return a JSON string without NUL bytes or null');
+                }
+                $len = strlen($json);
+                $buf = FFI::new('char[' . ($len + 1) . ']');
+                if ($len > 0) {
+                    FFI::memcpy($buf, $json, $len);
+                }
+                $buf[$len] = "\0";
+                $this->_resultBuffers[$field] = $buf;
+                return FFI::cast('const char*', FFI::addr($buf[0]));
+            }, [], null);
         };
         $cb->{$field} = $t;
         $this->_keepAlive[] = $t;
